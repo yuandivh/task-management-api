@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Resources\TaskResource;
 
 class TaskController extends Controller
 {
@@ -15,10 +16,12 @@ class TaskController extends Controller
                 "message"=>"Project not found"
             ],404);
         }
-        $tasks = $project->tasks()->get();
-        return response()->json([
-            "tasks"=>$tasks
-        ],200);
+        $tasks = $project->tasks()->with('project')->get();
+        return TaskResource::collection($tasks);
+
+        // return response()->json([
+        //     "tasks"=>$tasks
+        // ],200);
     }
 
     public function show(Request $request,$project_id,$task_id){
@@ -28,15 +31,16 @@ class TaskController extends Controller
                 "message"=>"Project not found"
             ],404);
         }
-        $task = $project->tasks()->find($task_id);
+        $task = $project->tasks()->with('project')->find($task_id);
         if(!$task){
             return response()->json([
                 "message"=>"Task not found"
             ],404);
         }
-        return response()->json([
-            "task"=>$task
-        ],200);
+        return new TaskResource($task);
+        // return response()->json([
+        //     "task"=>$task
+        // ],200);
     }
 
     public function store(Request $request,$project_id){

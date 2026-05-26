@@ -3,16 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProjectResource;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
     //
     public function index(){
-        $project = auth()->user()->projects()->with("tasks")->get();
-        return response()->json([
-            "projects"=>$project
-        ],200);
+        $project = auth()->user()->projects()->with(["tasks","user"])->get();
+        return ProjectResource::collection($project);
+        // return response()->json([
+        //     "projects"=>$project
+        // ],200);
     }
     public function store(Request $request)
     {
@@ -25,6 +27,7 @@ class ProjectController extends Controller
             "name"=>$request->name,
             "description"=>$request->description
         ]);
+        
         return response()->json([
             "message"=>"Project created successfully",
             "project"=>$project
@@ -32,15 +35,16 @@ class ProjectController extends Controller
     }
 
     public function show(Request $request, $id){
-        $project = $request->user()->projects()->with("tasks")->find($id);
+        $project = $request->user()->projects()->with(["tasks","user"])->find($id);
         if(!$project){
             return response()->json([
                 "message"=>"Project not found"
             ],404);
         }
-        return response()->json([
-            "project"=>$project
-        ],200);
+        return new ProjectResource($project);
+        // return response()->json([
+        //     "project"=>$project
+        // ],200);
     }
 
     public function update(Request $request,$id){
