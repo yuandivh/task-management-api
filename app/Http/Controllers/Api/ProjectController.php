@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProjectResource;
 use Illuminate\Http\Request;
+use App\Http\Requests\Project\StoreProjectRequest;
+use App\Http\Requests\Project\UpdateProjectRequest;
 
 class ProjectController extends Controller
 {
@@ -16,18 +18,18 @@ class ProjectController extends Controller
         //     "projects"=>$project
         // ],200);
     }
-    public function store(Request $request)
+    public function store(StoreProjectRequest $request)
     {
-        $request->validate([
-            "name"=>"required",
-            "description"=>"required"
-        ]);
+        // $request->validate([
+        //     "name"=>"required",
+        //     "description"=>"required"
+        // ]);
 
         $project = $request->user()->projects()->create([
             "name"=>$request->name,
             "description"=>$request->description
         ]);
-        
+
         return response()->json([
             "message"=>"Project created successfully",
             "project"=>$project
@@ -47,11 +49,11 @@ class ProjectController extends Controller
         // ],200);
     }
 
-    public function update(Request $request,$id){
-        $request->validate([
-            "name"=>"required",
-            "description"=>"sometimes"
-        ]);
+    public function update(UpdateProjectRequest $request, $id){
+        // $request->validate([
+        //     "name"=>"required",
+        //     "description"=>"sometimes"
+        // ]);
         $project = $request->user()->projects()->find($id);
         if(!$project){
             return response()->json([

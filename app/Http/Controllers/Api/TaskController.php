@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Task\StoreTaskRequest;
+use App\Http\Requests\Task\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
+use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
@@ -43,13 +45,13 @@ class TaskController extends Controller
         // ],200);
     }
 
-    public function store(Request $request,$project_id){
-        $request->validate([
-            "title"=>"required",
-            "description"=>"required",
-            "status"=>"sometimes|in:pending,in_progress,completed",
-            "due_date"=>"sometimes|date"
-        ]);
+    public function store(StoreTaskRequest $request,$project_id){
+        // $request->validate([
+        //     "title"=>"required",
+        //     "description"=>"required",
+        //     "status"=>"sometimes|in:pending,in_progress,completed",
+        //     "due_date"=>"sometimes|date"
+        // ]);
         $project = $request->user()->projects()->find($project_id);
         if(!$project){
             return response()->json([
@@ -68,13 +70,13 @@ class TaskController extends Controller
         ],201);
     }
 
-    public function update(Request $request,$project_id,$task_id){
-        $request->validate([
-            "title"=>"sometimes|required|string",
-            "description"=>"sometimes|nullable|string",
-            "status"=>"sometimes|in:pending,in_progress,completed",
-            "due_date"=>"sometimes|date"
-        ]);
+    public function update(UpdateTaskRequest $request,$project_id,$task_id){
+        // $request->validate([
+        //     "title"=>"sometimes|required|string",
+        //     "description"=>"sometimes|nullable|string",
+        //     "status"=>"sometimes|in:pending,in_progress,completed",
+        //     "due_date"=>"sometimes|date"
+        // ]);
         $project=$request->user()->projects()->find($project_id);
         if(!$project){
             return response()->json([
