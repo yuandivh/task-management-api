@@ -11,8 +11,12 @@ use App\Http\Requests\Project\UpdateProjectRequest;
 class ProjectController extends Controller
 {
     //
-    public function index(){
-        $project = auth()->user()->projects()->with(["tasks","user"])->get();
+    public function index(Request $request){
+        $project = auth()->user()->projects()->with(["tasks","user"]);
+        if($request->search){
+            $project->where("name","like","%".$request->search."%");
+        }
+        $project = $project->paginate($request->per_page ?? 10);
         return ProjectResource::collection($project);
         // return response()->json([
         //     "projects"=>$project
@@ -32,7 +36,7 @@ class ProjectController extends Controller
 
         return response()->json([
             "message"=>"Project created successfully",
-            "project"=>$project
+            "data"=>$project
         ],201);
     }
 
@@ -71,7 +75,7 @@ class ProjectController extends Controller
         ]);
         return response()->json([
             "message"=>"Project updated successfully",
-            "project"=>$project
+            "data"=>$project
         ]);
     }
 

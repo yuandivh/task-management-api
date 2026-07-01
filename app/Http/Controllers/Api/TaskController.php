@@ -18,7 +18,16 @@ class TaskController extends Controller
                 "message"=>"Project not found"
             ],404);
         }
-        $tasks = $project->tasks()->with('project')->get();
+        $tasks = $project->tasks()->with('project')
+        ->when($request->search, function ($query) use ($request){
+            $query->where("title","like","%".$request->search."%");
+
+        })
+        ->when($request->status, function ($query) use ($request){
+            $query->where("status",$request->status);
+        })
+        ->get();
+
         return TaskResource::collection($tasks);
 
         // return response()->json([
@@ -66,7 +75,7 @@ class TaskController extends Controller
         ]);
         return response()->json([
             "message"=>"Task created successfully",
-            "task"=>$task
+            "data"=>$task
         ],201);
     }
 
@@ -97,7 +106,7 @@ class TaskController extends Controller
         ]);
         return response()->json([
             "message"=>"Task updated successfully",
-            "task"=>$task
+            "data"=>$task
         ],200);
     }
 
