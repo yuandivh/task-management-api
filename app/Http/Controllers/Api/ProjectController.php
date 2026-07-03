@@ -16,11 +16,11 @@ class ProjectController extends Controller
         if($request->search){
             $project->where("name","like","%".$request->search."%");
         }
-        $project = $project->paginate($request->per_page ?? 10);
+        $project = $project->paginate($request->per_page ?? 20);
         return ProjectResource::collection($project);
-        // return response()->json([
-        //     "projects"=>$project
-        // ],200);
+
+        // Paginate tanpa pakai Resource
+        // return response()->json($project,200);
     }
     public function store(StoreProjectRequest $request)
     {
