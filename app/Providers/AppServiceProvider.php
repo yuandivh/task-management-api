@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Tasks;
+use App\Policies\TaskPolicy;
+use Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -9,6 +12,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
+
     public function register(): void
     {
         //
@@ -20,5 +24,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        Gate::policy(Tasks::class,TaskPolicy::class);
     }
 }

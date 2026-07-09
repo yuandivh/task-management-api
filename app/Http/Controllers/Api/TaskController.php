@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Task\StoreTaskRequest;
 use App\Http\Requests\Task\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
+use App\Models\Tasks;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -24,7 +25,7 @@ class TaskController extends Controller
 
         })
         ->when($request->status, function ($query) use ($request){
-            $query->where("status",$request->status);
+            $query->where("status","like","%".$request->status."%");
         })
         ->get();
 
@@ -35,19 +36,23 @@ class TaskController extends Controller
         // ],200);
     }
 
-    public function show(Request $request,$project_id,$task_id){
-        $project = $request->user()->projects()->find($project_id);
-        if(!$project){
-            return response()->json([
-                "message"=>"Project not found"
-            ],404);
-        }
-        $task = $project->tasks()->with('project')->find($task_id);
+    public function show(Request $request, $task_id){
+        // $project = $request->user()->projects()->find($project_id);
+        // if(!$project){
+        //     return response()->json([
+        //         "message"=>"Project not found"
+        //     ],404);
+        // }
+
+        $task = Tasks::with('project')->find($task_id);
         if(!$task){
             return response()->json([
                 "message"=>"Task not found"
             ],404);
         }
+
+        $this->authorize('view',$task);
+
         return new TaskResource($task);
         // return response()->json([
         //     "task"=>$task
@@ -79,25 +84,26 @@ class TaskController extends Controller
         ],201);
     }
 
-    public function update(UpdateTaskRequest $request,$project_id,$task_id){
+    public function update(UpdateTaskRequest $request,$task_id){
         // $request->validate([
         //     "title"=>"sometimes|required|string",
         //     "description"=>"sometimes|nullable|string",
         //     "status"=>"sometimes|in:pending,in_progress,completed",
         //     "due_date"=>"sometimes|date"
         // ]);
-        $project=$request->user()->projects()->find($project_id);
-        if(!$project){
-            return response()->json([
-                "message"=>"Project not found"
-            ],404);
-        }
-        $task = $project->tasks()->find($task_id);
+        // $project=$request->user()->projects()->find($project_id);
+        // if(!$project){
+        //     return response()->json([
+        //         "message"=>"Project not found"
+        //     ],404);
+        // }
+        $task = Tasks::find($task_id);
         if(!$task){
             return response()->json([
                 "message"=>"Task not found"
             ],404);
         }
+        $this->authorize('update',$task);
         $task->update([
             "title"=>$request->title ?? $task->title,
             "description"=>$request->description,
@@ -110,19 +116,20 @@ class TaskController extends Controller
         ],200);
     }
 
-    public function destroy(Request $request, $project_id,$task_id){
-        $project = $request->user()->projects()->find($project_id);
-        if(!$project){
-            return response()->json([
-                "message"=>"Project not found"
-            ],404);
-        }
-        $task = $project->tasks()->find($task_id);
+    public function destroy(Request $request,$task_id){
+        // $project = $request->user()->projects()->find($project_id);
+        // if(!$project){
+        //     return response()->json([
+        //         "message"=>"Project not found"
+        //     ],404);
+        // }
+        $task = Tasks::find($task_id);
         if(!$task){
             return response()->json([
                 "message"=>"Task not found"
             ],404);
         }
+        $this->authorize('delete',$task);
         $task->delete();
         return response()->json([
             "message"=> "Task deleted successfully",
