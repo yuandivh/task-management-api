@@ -21,19 +21,21 @@ class TaskController extends Controller
         }
         $tasks = $project->tasks()->with('project')
         ->when($request->search, function ($query) use ($request){
-            $query->where("title","like","%".$request->search."%");
+            $query->where("title","like","%".$request->search."%")
+            ->orWhere("status","like","%".$request->search."%");
 
         })
         ->when($request->status, function ($query) use ($request){
             $query->where("status","like","%".$request->status."%");
         })
-        ->get();
+        ->orderBy('due_date')
+        ->paginate(10);
 
-        return TaskResource::collection($tasks);
+        // return TaskResource::collection($tasks);
 
-        // return response()->json([
-        //     "tasks"=>$tasks
-        // ],200);
+        return response()->json([
+            "tasks"=>$tasks
+        ],200);
     }
 
     public function show(Request $request, $task_id){
