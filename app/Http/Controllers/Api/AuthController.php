@@ -37,29 +37,54 @@ class AuthController extends Controller
             "password"=>"required"
         ]);
 
-        if(!Auth::attempt($credentials))
-            {
-                return response()->json([
-                    "message"=>"Invalid credentials"
-                ],401);
-            }
 
-        $user = Auth::user();
-        $user->tokens()->delete();
-        $token = $user->createToken("api_token")->plainTextToken;
+        //Create token using Sanctum
+        // if(!Auth::attempt($credentials))
+        //     {
+        //         return response()->json([
+        //             "message"=>"Invalid credentials"
+        //         ],401);
+        //     }
+
+        // $user = Auth::user();
+        // $user->tokens()->delete();
+        // $token = $user->createToken("api_token")->plainTextToken;
+
+        //Create token using JWT
+
+        if(!$token = auth('api')->attempt($credentials))
+        {
+            return response()->json([
+                "message"=>"Invalid credentials"
+            ],401);
+        }
 
         return response()->json([
-            "message"=>"Login successful",
-            "token"=>$token
+            "token"=>$token,
+            "token_type"=>"bearer"
         ],200);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        // Revoke token using sanctum
+        // $request->user()->currentAccessToken()->delete();
+        // return response()->json([
+        //    "message"=>"Logged out successfully",
+        // ],200);
+
+        // Revoke token using JWT
+        auth('api')->logout();
         return response()->json([
-           "message"=>"Logged out successfully",
+            "message" => "Logged out successfully"
         ],200);
+    }
+
+    public function refresh()
+    {
+        return response()->json([
+            'token' => auth('api')->refresh()
+        ]);
     }
 }
 

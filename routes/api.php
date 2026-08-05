@@ -8,11 +8,13 @@ use App\Http\Controllers\Api\TaskController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
-})->middleware('auth:sanctum');
+})->middleware('auth:api');
 
 Route::post('/register',[AuthController::class,'register']);
 Route::post('/login',[AuthController::class,'login'])->middleware('throttle:login');
-Route::middleware(['auth:sanctum','throttle:api'])->group(function (){
+Route::post('/refresh',[AuthController::class,'refresh']);
+
+Route::middleware(['auth:api','throttle:api'])->group(function (){
     Route::post('/logout',[AuthController::class,'logout']);
     Route::get('/projects',[ProjectController::class,'index']);
     Route::post('/projects',[ProjectController::class,'store']);

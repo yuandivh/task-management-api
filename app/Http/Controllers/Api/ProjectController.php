@@ -12,7 +12,7 @@ class ProjectController extends Controller
 {
     //
     public function index(Request $request){
-        $project = auth()->user()->projects()->with(["tasks","user"]);
+        $project = $request->user()->projects()->with(["tasks","user"]);
         if($request->search){
             $project->where("name","like","%".$request->search."%");
         }
