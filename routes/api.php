@@ -18,6 +18,7 @@ Route::middleware(['auth:api','throttle:api'])->group(function (){
     Route::post('/logout',[AuthController::class,'logout']);
     Route::get('/projects',[ProjectController::class,'index']);
     Route::post('/projects',[ProjectController::class,'store']);
+    Route::get('/projects/test_cache',[ProjectController::class,'testCache']);
     Route::get('/projects/{id}',[ProjectController::class,'show']);
     Route::put('/projects/{id}',[ProjectController::class,'update']);
     Route::delete('/projects/{id}',[ProjectController::class,'destroy']);
